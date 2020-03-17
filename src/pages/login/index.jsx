@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import "./styles.css"
 import { Redirect } from "react-router-dom"
+import Swal from "sweetalert2"
 import Input from "../../components/Input"
 import Form from "../../components/Form"
 import logo from "./logoECOS.png"
@@ -28,17 +29,39 @@ export default class LoginPage extends Component {
     }
   }
 
-  onClick = async () => {
-    const { username, password } = this.state
-    await this.api.postLogin(username, password).then(response => {
-      if (response.status === 200) {
-        login(response.headers.authorization)
-      }
-      this.setState({ access: true })
-      if (response.status === 400) {
-        this.setState({ access: false })
+  alert = (icon, title) => {
+    this.Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+      onOpen: toast => {
+        toast.addEventListener("mouseenter", Swal.stopTimer)
+        toast.addEventListener("mouseleave", Swal.resumeTimer)
       }
     })
+    this.Toast.fire({
+      icon,
+      title
+    })
+  }
+
+  signin = async () => {
+    const { username, password } = this.state
+    await this.api
+      .postLogin(username, password)
+      .then(response => {
+        if (response.status === 200) {
+          login(response.headers.authorization)
+          this.alert("success", "Signed in successfully")
+          this.setState({ access: true })
+        }
+      })
+      .catch(() => {
+        this.setState({ access: false })
+        this.alert("error", "Failed to sign in!")
+      })
   }
 
   render() {
@@ -60,7 +83,7 @@ export default class LoginPage extends Component {
             onBlur={this.handleChange}
           />
           <section id="separate-login-buttons">
-            <Button value="Sign in" onClick={this.onClick} />
+            <Button value="Sign in" onClick={this.signin} />
             <Button value="Sign up" />
           </section>
         </Form>

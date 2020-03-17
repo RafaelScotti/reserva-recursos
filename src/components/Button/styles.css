@@ -19,7 +19,7 @@ button.main-button:hover {
   box-shadow: 0 0 5px 0 #4e7e62;
 }
 
-button.main-button:focus {
+button.main-button:active{
   background: rgb(96, 173, 77);
   color: whitesmoke;
   transition: all .1s ;
